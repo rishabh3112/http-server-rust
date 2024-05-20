@@ -60,17 +60,16 @@ fn handle_connection(stream: &TcpStream) {
             return respond_stream(
                 format!("HTTP/1.1 200 OK\r\n{encoding_header}Content-type: text/plain\r\nContent-length: {length}\r\n\r\n{string}").as_str(),
                 stream
-            )
-        } else {
-            let body = buffer.unwrap();
-            let length = body.len();
+            );
+        }
+        
+        let body = buffer.unwrap();
+        let length = body.len();
 
-            let mut response = format!("HTTP/1.1 200 OK\r\n{encoding_header}Content-type: text/plain\r\nContent-length: {length}\r\n\r\n").as_bytes().to_vec();
-            response.extend(body);
-    
-            return respond_stream_with_buffer(&response, stream)
-            
-        };
+        let mut response = format!("HTTP/1.1 200 OK\r\n{encoding_header}Content-type: text/plain\r\nContent-length: {length}\r\n\r\n").as_bytes().to_vec();
+        response.extend(body);
+
+        return respond_stream_with_buffer(&response, stream);
     } else if request.ty == "GET" && request.path == "/user-agent" {
         let string = request.headers.get("user-agent").unwrap();
         let length = string.len();

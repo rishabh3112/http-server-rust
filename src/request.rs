@@ -47,9 +47,9 @@ impl Request {
         }
 
         let mut body: Option<String> = None;
-        if headers.contains_key("Content-Length") {
+        if headers.contains_key("content-length") {
             let content_length = headers
-                .get("Content-Length")
+                .get("content-length")
                 .unwrap()
                 .parse::<usize>()
                 .unwrap_or(0);
@@ -57,7 +57,6 @@ impl Request {
             if content_length > 0 {
                 let mut buffer = vec![0; content_length];
                 buf_reader.read_exact(&mut buffer).unwrap();
-
                 body = Some(std::str::from_utf8(&buffer).unwrap().to_string());
             } else {
                 body = Some("".to_string())
