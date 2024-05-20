@@ -43,7 +43,7 @@ impl Request {
                 .collect_tuple()
                 .unwrap();
 
-            headers.insert(header_key, header_value);
+            headers.insert(header_key.to_lowercase(), header_value);
         }
 
         let mut body: Option<String> = None;
