@@ -5,7 +5,7 @@ use request::Request;
 use thread_pool::ThreadPool;
 
 use std::{
-    env, fs::read_to_string, io::Write, net::{TcpListener, TcpStream}, path::Path
+    env, fs::{read_to_string, write}, io::Write, net::{TcpListener, TcpStream}, path::Path
 };
 
 fn respond_stream(response: &str, mut stream: &TcpStream) {
@@ -31,7 +31,7 @@ fn handle_connection(stream: &TcpStream) {
             stream
         );
     } else if request.ty == "GET" && request.path == "/" {
-        return respond_stream("HTTP/1.1 200 OK\r\nContent-length: 0\r\n\r\n", stream);
+        return respond_stream("HTTP/1.1 200 OK\r\n\r\n\r\n", stream);
     } else if request.ty == "GET" && path_fragments[1] == "files" && path_fragments.len() >= 3 {
         let filename = path_fragments[2];
         let args: Vec<String> = env::args().collect();
@@ -43,6 +43,21 @@ fn handle_connection(stream: &TcpStream) {
 
                 return respond_stream(
                     format!("HTTP/1.1 200 OK\r\nContent-type: application/octet-stream\r\nContent-length: {length}\r\n\r\n{file_content}").as_str(),
+                    stream
+                )
+            }
+        }
+    } else if request.ty == "POST" && path_fragments[1] == "files" && path_fragments.len() >= 3 {
+        let filename = path_fragments[2];
+        let file_content = request.body;
+        let args: Vec<String> = env::args().collect();
+
+        if args.len() >= 3 && args[1] == "--directory" {
+            let file_path = Path::new(args[2].trim()).join(filename);
+
+            if let Ok(_) = write(&file_path, file_content.unwrap()) {
+                return respond_stream(
+                    format!("HTTP/1.1 201 Created\r\n\r\n\r\n").as_str(),
                     stream
                 )
             }
