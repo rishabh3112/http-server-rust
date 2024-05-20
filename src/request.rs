@@ -6,7 +6,6 @@ use std::{
 
 use itertools::Itertools;
 
-
 pub struct Request {
     pub ty: String,
     pub path: String,
@@ -20,7 +19,11 @@ impl Request {
         let mut status_line: String = String::new();
         buf_reader.read_line(&mut status_line).unwrap();
 
-        let (ty, path, _protocol) = status_line.split(" ").map(|fragments| fragments.to_string()).collect_tuple().unwrap();
+        let (ty, path, _protocol) = status_line
+            .split(" ")
+            .map(|fragments| fragments.to_string())
+            .collect_tuple()
+            .unwrap();
 
         let mut headers: HashMap<String, String> = HashMap::new();
         loop {
@@ -65,7 +68,7 @@ impl Request {
             ty,
             path,
             headers,
-            body
+            body,
         }
     }
 }
